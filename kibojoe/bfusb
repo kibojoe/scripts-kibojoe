@@ -1,0 +1,295 @@
+#!/bin/sh
+#
+#########################################
+# Kibojoe Linux				#
+# Updated 29.09.2017 23:05:14 		#
+# Version 0.1-1 			#
+# Name bfusb ; Backup Format USB Tool 	#
+# Use chmod +x bfusb ; /usr/bin/kibojoe #
+# Credits Diego Macias (dmaciasblog)    #
+# Site https://www.dmaciasblog.com      #
+# Adapted Holmes (Kibojoe Linux)	#
+# Site http://kibojoe.org               #
+# License Copyleft 			#
+#########################################
+
+function help_text() {
+	less 	<<-EOF
+Welcome to Backup Format USB Tool's information page.
+BFUSBTool is a script that does backup and formatting safely your USB.
+
+ATTENTION
+*The options 6 and 7 can delete all USB contents. WARNING! USE WITH CAUTION.
+
+e - EXIT BFUSBTOOL
+"clear && kill -9 -$PPID"
+This will exit BFUSBTool and closes the sakura terminal.
+
+i - INFORMATION BFUSBTOOL
+Display this information page.
+
+1 - PARTITION TABLE 
+"lsblk -f"
+lsblk lists information about all available or the specified block devices. lsblk -f lits output info about filesystems
+
+2 - LOOK USB DRIVE
+"df"
+The df command reports the amount of available disk space being used by file systems.
+
+3 - LIST MOUNTED FILE SYSTEMS
+"findmnt"
+findmnt will list all mounted filesytems or search for a filesystem.
+
+4 - BACKUP USB DRIVE 
+"grsync"
+Grsync is used to synchronize folders, files and make backups. It is a rsync GUI.
+
+5 - WIKI FILE SYSTEMS
+Visit the Arch Linux Wiki web page about File systems.
+
+6 - BASIC FORMATTING
+"basica"
+In the basic mode I only put the most used formats: FAT32 NTFS ext3 ext4.
+
+7 - INSTALLED PACKAGE INFO
+"avanzada"
+Advanced mode takes us to cfdisk to work with the device.
+
+To exit this Help Page, press "q".
+	EOF
+}
+
+### FUNCTION CHECK DISCS
+    # we list the devices and we cancel the Hotplug 0 before
+    # every major operation
+function comprobar() {
+    if [[ "$disp" = "e" ]] || [[ "$disp" = "E" ]] || [[ "$part" = "e" ]] || [[ "$part" = "E" ]]; then
+        menu_principal
+    else
+        if [[ $(lsblk -d -o HOTPLUG /dev/$disp | grep -w 1) -ne 1 ]]; then
+            echo
+            echo -e "\tTHE UNIT $disp NOT USB"
+            echo
+            tecla
+            basica
+        fi
+    fi
+}
+
+### USB DETECT FUNCTION
+function detectar() {
+    lsblk -d -o HOTPLUG,MODEL,NAME,SIZE,LABEL | grep -w 1 > /tmp/partition.txt
+
+    ### WE CHECK IF USB IS CONNECTED
+    if [[ -s /tmp/partition.txt ]]; then
+        echo
+        echo -e "\t\t\t NAME"
+        echo -e "------------------------------------------------------------------"
+        cat /tmp/partition.txt
+        echo
+    else
+        echo "USB device not found"
+        tecla
+        menu_principal
+    fi
+}
+
+### KEY FUNCTION
+function tecla() {
+    echo "Wrong option! Wait and try again..."
+    echo
+    sleep 2
+    clear
+}
+
+### BASIC FUNCTION
+function basica() {
+    clear
+    detectar
+    lsblk -o model,name,size,tran | grep -A 5 usb
+    echo
+    echo -n -e "\t▶ Select device (p.e. sda, sdb, sdc, etc...[✓ e Exit]): "
+    read disp
+    echo
+    comprobar
+    echo -n -e "\t▶ Select partition (p.e. 1, 2, 3, etc...[✓ e Exit]): "
+    read part
+    echo
+    comprobar
+    formato
+    echo
+    echo -n -e "\tPartition name: "
+    read label
+    label=$(echo $label | tr '[:lower:]' '[:upper:]')
+
+    if [[ $(ls /dev | grep -c $disp$part) = "1" ]]; then
+        echo
+        echo -e "\tYou are going to format $disp$part in $f with name $label "
+        echo -n -e "\tYou want to make changes (S/N): "
+        read cambios
+        case $cambios in
+            s|S)
+            sudo umount -v /dev/$disp$part
+            if [[ $format = 'mkfs.vfat -F32' ]]; then
+                sudo $format -n $label /dev/$disp$part
+                echo
+                echo -e "\tSuccessful operation"
+            else
+                sudo $format /dev/$disp$part -L $label
+                echo
+                echo -e "\tSuccessful operation"
+            fi
+            tecla
+            ;;
+            n|N)
+            echo -e "\tOperation canceled..."
+            tecla
+            ;;
+            *)
+            echo -e "\tInvalid option"
+            tecla
+            basica
+            ;;
+        esac
+
+    else
+        echo "partition does not exist"
+        tecla
+        basica
+    fi
+
+}
+
+### FUNCTION MENU FORMAT
+function formato() {
+    echo
+    echo -e "\tSelect format"
+    echo
+    echo -e "\t\t1.\tFAT32"
+    echo -e "\t\t2.\tNTFS"
+    echo -e "\t\t3.\tExt3"
+    echo -e "\t\t4.\tExt4"
+    echo -n -e "\tFormat: "
+    read n
+    case $n in
+            1)
+            format='mkfs.vfat -F32'
+            f='FAT32'
+            ;;
+            2)
+            format='mkfs.ntfs'
+            f='NTFS'
+            ;;
+            3)
+            format='mkfs.ext3'
+            f='EXT3'
+            ;;
+            4)
+            format='mkfs.ext4'
+            f='EXT4'
+            ;;
+            *)
+            echo -e "\tInvalid option..."
+            sleep 1
+            formato
+            ;;
+    esac
+}
+
+### ADVANCED FUNCTION
+function avanzada() {
+    clear
+    detectar
+    echo -n -e "\t▶ Select device (p.e. sdb, sdc, sdd, etc...[✓ e Exit]): "
+    read dispo
+    comprobar
+    filtro=$(grep -c $dispo /tmp/partition.txt)
+    if [[ $filtro = "1" ]]; then
+        sudo cfdisk /dev/$dispo
+        tecla
+    else
+        echo -e "\tDevice not found"
+        sleep 1
+        tecla
+        avanzada
+    fi
+}
+
+#### MENU PRINCIPAL
+function menu_principal() {
+
+
+    while true; do
+        clear
+        echo ""
+        echo -e "                            Backup Format USB Tool"
+        echo ""
+        echo -e "                       Backup and formatting USB safely!"
+        echo -e " ┌─────────────────────────────────────────────────────────────────────────┐"
+        echo -e " │  1     Partition Table                   2     Look USB Drive           │"
+        echo -e " │  3	  List Mounted File Systems         4     Backup USB Drive         │"
+        echo -e " │  5	  Wiki File Systems				                   │"
+        echo -e " │-------------------------------------------------------------------------│"
+        echo -e " │  6	 *Basic Formatting                  7    *Advanced Formatting      │"
+        echo -e " └─────────────────────────────────────────────────────────────────────────┘"
+        echo ""
+        echo -e "       ✓ Select a number and press [Enter] ✓ e Exit ✓ i Information"
+        echo ""
+        read choix
+        case $choix in
+    	1)
+    	 echo
+         lsblk -f
+         echo
+         echo -e "Done! Return to BFUSBTool press [Enter]"
+         read
+         ;;
+	2)
+    	 echo
+         df
+         echo
+         echo -e "Done! Return to BFUSBTool press [Enter]"
+         read
+         ;;
+    	3)
+    	 echo
+         findmnt
+         echo
+         echo -e "Done! Return to BFUSBTool press [Enter]"
+         read
+         ;;
+    	4)
+    	 echo
+         grsync
+         echo
+         echo -e "Done! Return to BFUSBTool press [Enter]"
+         read
+         ;;
+    	5)
+    	 echo
+    	 $BROWSER https://wiki.archlinux.org/index.php/file_systems
+    	 echo
+    	 echo -e "Homepage visited! Return to BFUSBTool press [Enter]"
+    	 read
+    	 ;;
+    	6)
+         basica
+         ;;
+        7)
+         avanzada
+	 ;;
+	e)
+         clear && kill -9 -$PPID
+    	 ;;
+    	i)
+         echo
+         help_text
+         echo
+         ;;
+        *)
+         tecla
+         ;;
+       esac
+    done
+}
+menu_principal

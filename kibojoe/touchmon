@@ -1,0 +1,552 @@
+#!/bin/bash
+#
+##################################################
+# Kibojoe /Linux 			         #
+# Updated 18.02.2017 19:07:02 		         #
+# Version 0.1-2 			         #
+# Name touchmon ; TouchMon Configuration Tool    #
+# Use chmod +x touchmon ; /usr/bin/kibojoe       #
+# Credits Chrysostomus (Manjaro Linux)           #
+# Site http://polr.me/1gmi ; http://polr.me/1gmq #
+# Adapted Holmes (Kibojoe Linux)		 #
+# Site http://kibojoe.org                        #
+# License Copyleft 			         #
+##################################################
+
+function help_text() {
+	less 	<<-EOF
+Welcome to TouchMon Configuration Tool's information page.
+TouchMon is an interactive configure xinput and xrandr for your command line terminal. It provides an easy user interface to edit configuration files of the xinput and xrandr. You can also edit other files.
+
+HOME SCREEN
+TouchMon Configuration Tool's home screen is split into two parts: 
+The upper part focuses on xinput file, configuring some features of your touchpad.
+The lower part focuses on xrandr file, configuring some features of your monitor. 
+Choose an option by entering its number and pressing [Enter].
+
+e - EXIT TOUCHMON
+"clear && kill -9 -$PPID"
+This will exit TouchMon and closes the sakura terminal.
+
+i - INFORMATION TOUCHMON
+Display this information page.
+
+1- SET POINTER SPEED
+Set pointer speed of your touchpad.
+
+2- TOGGLE TAP TO CLICK
+Toggle tap to click of your touchpad.
+
+3- TOGGLE DRAG LOCK
+Toggle drag lock of your touchpad.
+
+4- TOGGLE LEFT HANDED MODE
+Toggle left handed mode of your touchpad.
+
+5- TOGGLE DISABLE WHILE TYPING
+Toggle disable while typing of your touchpad.
+
+6- TOGGLE NATURAL SCROLLING
+Toggle natural scrolling of your touchpad.
+
+7- TOGGLE HORIZONTAL SCROLLING
+Toggle horizontal scrolling of your touchpad.
+
+8- COMMANDS MANUAL XINPUT
+Get help xinput.
+
+9- WIKI XINPUT
+Visit the ArchLinux wiki about xinput.
+
+10- LIST MONITORS
+List the existing monitors.
+
+11- SET RESOLUTION
+Set the monitor resolution.
+
+12- SET PRIMARY MONITOR
+Set the primary monitor.
+
+13- POSITION MONITORS
+Set position the monitors.
+
+14- CONNECT/DISCONNECT MONITOR
+Connect or disconnect the monitor.
+
+15- ROTATE MONITOR
+Rotate the monitor.
+
+16- SAVE DISPLAY SETTINGS
+Save display settings
+
+17- DYNAMIC MONITOR DETECTION
+Dynamic monitor detection.
+
+18- ACCESS ARANDR
+Is designed to provide a simple visual front end for xrandr.
+
+19- COMMANDS MANUAL XRANDR
+Get help xrandr.
+
+20- WIKI XRANDR
+Visit the ArchLinux wiki about xrandr.
+
+To exit this information page, press "q".
+	EOF
+}
+
+###xinput###
+touchpad_id=$(xinput --list | grep -i "touchpad" | xargs -n 1 | grep "id=" | sed 's/id=//g')
+
+toggle_natural_scrolling()
+{
+natural_scrolling_code=$(xinput --list-props $touchpad_id | grep "Natural Scrolling" | awk '{print $5}' |  grep -o '[0-9]\+')
+
+if [[ $(xinput --list-props $touchpad_id | grep "Natural Scrolling Enabled (" | awk '{print $6}' | head -n1) == 1 ]]; then
+	xinput --set-prop $touchpad_id $natural_scrolling_code 0 && echo "Natural scrolling is now disabled" || echo "Something vent wrong"
+else
+	xinput --set-prop $touchpad_id $natural_scrolling_code 1 && echo "Natural scrolling is now enabled" || echo "Something vent wrong"		
+fi
+
+}
+
+toggle_tap_to_click()
+{
+tap_to_click_code=$(xinput --list-props 10 | awk '/Tapping Enabled \(/ {print $4}' | grep -o '[0-9]\+')
+
+if [[ $(xinput --list-props $touchpad_id | awk '/Tapping Enabled \(/ {print $5}') == 1 ]]; then
+	xinput --set-prop $touchpad_id $tap_to_click_code 0 && echo "Tap to click is now disabled" || echo "Something vent wrong"
+else
+	xinput --set-prop $touchpad_id $tap_to_click_code 1 && echo "Tap to click is now enabled" || echo "Something vent wrong"		
+fi
+
+}
+
+toggle_left_handed()
+{
+left_handed_code=$(xinput --list-props $touchpad_id | grep "Left Handed Enabled" | awk '{print $5}' |  grep -o '[0-9]\+')
+
+if [[ $(xinput --list-props $touchpad_id | grep "Left Handed Enabled" | awk '{print $6}' | head -n1) == 1 ]]; then
+	xinput --set-prop $touchpad_id $left_handed_code 0 && echo "Left handed mode is now disabled" || echo "Something vent wrong"
+else
+	xinput --set-prop $touchpad_id $left_handed_code 1 && echo "Left handed mode is now enabled" || echo "Something vent wrong"		
+fi
+
+}
+
+set_pointer_speed()
+{
+
+accel_speed_code=$(xinput --list-props $touchpad_id | awk '/Accel Speed \(/ {print $4}' | grep -o '[0-9]\+')
+current_speed=$(xinput --list-props $touchpad_id | awk '/Accel Speed \(/ {print $5}')
+
+	echo ""
+	echo "Setting pointer speed."
+	echo "Current speed is $current_speed"
+	echo "input number between -1 and 1 and press [Enter]"
+	read speed
+	xinput --set-prop $touchpad_id $accel_speed_code $speed
+	echo "Speed is now set to $speed."
+	read -r -p "${1:-Do you wish to make this setting permanent? [Y/n]} " response
+    case $response in
+        [nN][oO]) 
+            false
+            ;;
+        *)
+            sudo bash -c 'echo -e "Section \"InputClass\"
+	\tIdentifier \"'$touchpad_id'\"
+	\tDriver \"libinput\"
+	\tMatchIsTouchpad \"on\"
+	\tOption \"AccelSpeed\" \"'$speed'\"
+EndSection" > /etc/X11/xorg.conf.d/31-pointerspeed.conf'
+            ;;
+    esac
+    echo ""
+    echo "created file /etc/X11/xorg.conf.d/31-pointerspeed.conf. 
+    Press any key to continue"
+    read -s -n1
+}
+
+toggle_drag_lock()
+{
+drag_lock_code=$(xinput --list-props $touchpad_id | grep "Drag Lock Enabled (" | awk '{print $6}' |  grep -o '[0-9]\+')
+
+if [[ $(xinput --list-props $touchpad_id | grep "Drag Lock Enabled (" | awk '{print $7}' | head -n1) == 1 ]]; then
+	xinput --set-prop $touchpad_id $drag_lock_code 0 && echo "Drag lock is now disabled" || echo "Something vent wrong"
+else
+	xinput --set-prop $touchpad_id $drag_lock_code 1 && echo "Drag lock is now enabled" || echo "Something vent wrong"		
+fi
+
+}
+
+toggle_disable_while_typing()
+{
+disable_while_typing_code=$(xinput --list-props $touchpad_id | grep "Disable While Typing Enabled (" | awk '{print $6}' |  grep -o '[0-9]\+')
+
+if [[ $(xinput --list-props $touchpad_id | grep "Disable While Typing Enabled (" | awk '{print $7}' | head -n1) == 1 ]]; then
+	xinput --set-prop $touchpad_id $disable_while_typing_code 1 && echo "Touchpad is now disabled while typing" || echo "Something vent wrong"
+else
+	xinput --set-prop $touchpad_id $disable_while_typing_code 0 && echo "Touchpad is now enabled while typing" || echo "Something vent wrong"		
+fi
+
+}
+
+toggle_horizontal_scrolling()
+{
+horizontal_scrolling_code=$(xinput --list-props $touchpad_id | grep "Horizontal Scroll Enabled" | awk '{print $5}' |  grep -o '[0-9]\+')
+
+if [[ $(xinput --list-props $touchpad_id | grep "Horizontal Scroll Enabled" | awk '{print $6}' | head -n1) == 1 ]]; then
+	xinput --set-prop $touchpad_id $horizontal_scrolling_code 0 && echo "Horizontal scrolling is now disabled" || echo "Something vent wrong"
+else
+	xinput --set-prop $touchpad_id $horizontal_scrolling_code 1 && echo "Horizontal scrolling is now enabled" || echo "Something vent wrong"		
+fi
+
+}
+
+###xrandr###
+export XAUTHORITY=/home/$(whoami)/.Xauthority
+RED='\e[41m'
+BLUE='\e[44m'
+ORANGE='\e[46m'
+NC='\e[0m'
+
+connected_monitors=$(xrandr -q | awk '/ connected/ {print $1}')
+all_monitors=$(xrandr -q | awk '/connected/ {print $1}')
+current_resolution=$(xrandr -q | awk '/*/ {print $1}')
+
+in_array() {
+    local haystack=${1}[@]
+    local needle=${2}
+    for i in ${!haystack}; do
+        if [[ ${i} == ${needle} ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+function save_settings {
+	echo -e "What should the new profile be called?"
+	read profile
+	autorandr --save $profile
+	echo -e "Current settings were save under the name $profile"
+}
+
+function choose_monitor {
+xrandr -q | awk '/connected/ {print $1}' | pmenu -p 'Choose monitor to operate on >'
+}
+
+function choose_connected_monitor {
+PS3="Choose monitor to operate on: "
+# Gather the results in an array.
+monitors=($connected_monitors "proceed" "cancel")
+xrandr -q | awk '/ connected/ {print $1}' | pmenu -p 'Choose monitor to operate on >'
+}
+
+function choose_second_monitor {
+xrandr -q | awk '/connected/ {print $1}' | pmenu -p 'Relative to which monitor? >'
+}
+
+function choose_resolution {
+PS3="Choose new resolution: "
+# Gather the results in an array.
+chosen_monitor=$(choose_connected_monitor)
+next_monitor=$(xrandr -q | awk '/connected/ {print $1}' | sed -n "/$chosen_monitor/{n;p;}")
+resolutions=($(xrandr -q | sed -n -e "/$chosen_monitor/,/$next_monitor/ p" | awk '{print $1}' | sed -e '1d;$d') "cancel")
+
+select pick in "${resolutions[@]}"
+do
+	case $pick in
+		cancel)
+			break
+			;;		
+		*)	
+			picks+=("$pick")
+			break
+			;;		
+	esac
+done
+
+if [[ $picks ]]; then
+    printf 'Setting resolution to %s\n' "${picks[*]}"
+    xrandr --output $chosen_monitor --mode "${picks[@]}"
+    picks=()
+fi
+}
+
+
+function rotate_monitor {
+PS3="Choose rotation: "
+# Gather the results in an array.
+chosen_monitor=$(choose_monitor)
+action=("left" "right" "inverted" "normal" "cancel")
+
+select pick in "${action[@]}"
+do
+	case $pick in
+		cancel)
+			break
+			;;
+		*)	
+			picks+=("$pick")
+			break
+			;;		
+	esac
+done
+
+if [[ $picks ]]; then
+    printf 'Setting orientation to %s\n' "${picks[*]}"
+    xrandr --output "$chosen_monitor" --rotate "${picks[@]}"
+    picks=()
+fi
+}
+
+
+function connect_monitor {
+PS3="Choose monitor to connect or disconnect: "
+# Gather the results in an array.
+connected_monitors=($(xrandr -q | awk '/ connected/ {print $1}'))
+chosen_monitor=$(choose_monitor)
+
+if in_array connected_monitors $chosen_monitor; then
+		xrandr --output $chosen_monitor --off	
+	else
+		xrandr --output --auto $chosen_monitor 
+fi
+}
+
+function choose_position {
+positions=("left-of" "right-of" "above" "below" "same-as" "cancel")
+PS3="Where to place this monitor?: "
+select pick in "${positions[@]}"
+do
+	case $pick in
+		*)	
+			picks+=("$pick")
+			echo "${picks[@]}"
+			break
+			;;		
+	esac
+done
+}
+
+function move_monitor {
+# Gather the results in an array.
+chosen_monitor=$(choose_connected_monitor)
+position=$(choose_position)
+other_monitor=$(choose_second_monitor)
+if ! [[ $position == cancel ]]; then
+	xrandr --output $chosen_monitor --$position $other_monitor
+else 
+	echo -e "Procedure cancelled"
+fi
+}
+
+function set_primary {
+	mon=$(choose_connected_monitor)
+	xrandr --output $mon --primary
+}
+
+    while true; do
+    clear
+    echo ""
+    echo -e "                         TouchMon Configuration Tool"
+    echo ""
+    echo -e "                    Quick settings for touchpad/monitor!"
+    echo -e " ┌─────────────────────────────────────────────────────────────────────────┐"
+    echo -e " │    1     Set pointer speed              2     Toggle tap to click       │"
+    echo -e " │    3     Toggle drag lock               4     Toggle left handed mode   │"
+    echo -e " │    5     Toggle disable while typing    6     Toggle natural scrollin   │"
+    echo -e " │    7     Toggle horizontal scrolling    8     Access LXinput            │"
+    echo -e " │    9     Commands Manual Xinput        10     Wiki Xinput               │"
+    echo " └─────────────────────────────────────────────────────────────────────────┘" 
+    echo ""
+    echo " ┌─────────────────────────────────────────────────────────────────────────┐"
+    echo -e " │   11     List monitors                 12     Set resolution            │"
+    echo -e " │   13     Set primary monitor           14     Position monitor          │"
+    echo -e " │   15     Connect/disconnect monitor    16     Rotate monitor            │"
+    echo -e " │   17     Save display settings         18     Dynamic monitor detection │"
+    echo -e " │   19     Access ARandR                 20     Commands Manual XRandR    │"    
+    echo -e " │   21     Wiki XRandR                                                    │"
+    echo " └─────────────────────────────────────────────────────────────────────────┘"
+    echo ""
+    echo -e "      ✓ Select a number and press [Enter] ✓ e Exit ✓ i Information"
+    echo ""
+    read choix
+    case $choix in
+          1)
+            echo
+            set_pointer_speed
+            echo
+            echo -e "Pointer speed defined! Return to TouchMon press [Enter]"
+            read
+            ;;
+          2)
+            echo
+            toggle_tap_to_click
+            read -s -n1
+            echo
+            echo -e "Tap to click changed! Return to TouchMon press [Enter]"
+            read
+            ;;
+          3)
+            echo
+            toggle_drag_lock
+            read -s -n1
+            echo
+            echo -e "Drag lock changed! Return to TouchMon press [Enter]"
+            read
+            ;;
+          4)
+            echo
+            toggle_left_handed
+            read -s -n1
+            echo
+            echo -e "Left handed mode changed! Return to TouchMon press [Enter]"
+            read
+	    ;;
+	  5)
+            echo
+            toggle_disable_while_typing
+            read -s -n1
+            echo
+            echo -e "Disable while typing changed! Return to TouchMon press [Enter]"
+            read
+            ;;
+          6)
+            echo
+            toggle_natural_scrolling
+            read -s -n1
+            echo
+            echo -e "Natural scrollin changed! Return to TouchMon press [Enter]"
+            read
+            ;;
+          7)
+            echo
+            toggle_horizontal_scrolling
+            read -s -n1
+            echo
+            echo -e "Horizontal scrolling changed! Return to TouchMon press [Enter]"
+            read
+            ;;
+          8)
+            echo
+            lxinput
+            echo
+            echo -e "LXinput accessed! Return to TouchMon press [Enter]"
+            read
+            ;;    
+          9)
+            echo
+            man xinput
+            echo
+            echo -e "Commands manual visited! Return to TouchMon press [Enter]"
+            read
+            ;;
+         10)
+            echo
+            $BROWSER https://wiki.archlinux.org/index.php/Touchpad_Synaptics
+            echo
+            echo -e "Homepage visited! Return to TouchMon press [Enter]"
+            read
+            ;;
+         11)
+            echo
+            xrandr -q
+            echo
+            echo -e "Monitors listed! Return to TouchMon press [Enter]"
+            read
+            ;;
+         12)
+            echo
+            choose_resolution
+            echo
+            echo -e "Resolution defined! Return to TouchMon press [Enter]"
+            read
+            ;;
+         13)
+            echo
+            set_primary
+            echo
+            echo -e "Primary monitor defined! Return to TouchMon press [Enter]"
+            read
+            ;;
+         14)
+            echo
+            move_monitor
+            echo
+            echo -e "Position monitor defined! Return to TouchMon press [Enter]"
+            read
+            ;;
+        15)
+            echo
+            choose_monitor | connect_monitor
+            echo
+            echo -e "Selection made! Return to TouchMon press [Enter]"
+            read
+            ;;
+         16)
+            echo
+            rotate_monitor
+            echo
+            echo -e "Monitor rotated! Return to TouchMon press [Enter]"
+            read
+            ;;
+         17)
+            echo
+            save_settings
+            echo
+	    echo 'Add "autorandr --change --default" to your autostart file' 
+	    echo 'to automatically choose profile on startup'
+            echo -e "Saved display settings! Return to TouchMon press [Enter]"
+            echo
+            read
+            ;;
+         18)
+            echo
+            sudo pacman -S srandrd
+            echo
+            echo 'Add "sranrdrd autorandr --change --default" to your autostart file' 
+	    echo 'to load settings when monitor is plugged in. Use option 7 '
+	    echo 'to save your settings for different monitor configurations.'
+            echo -e "Monitor dynamic detected! Return to TouchMon press [Enter]"
+            echo
+            read
+            ;;
+         19)
+            echo
+            arandr
+            echo
+            echo -e "ARandR accessed! Return to TouchMon press [Enter]"
+            read
+            ;;        
+         20)
+            echo
+            man xrandr
+            echo
+            echo -e "Commands manual visited! Return to TouchMon press [Enter]"
+            read
+            ;;
+         21)
+            echo
+            $BROWSER https://wiki.archlinux.org/index.php/xrandr
+            echo
+            echo -e "Homepage visited! Return to TouchMon press [Enter]"
+            read
+            ;;
+          e)
+            clear && kill -9 -$PPID
+            ;;
+          i)
+            echo
+            help_text
+            echo
+            ;;
+          *)
+            echo "Wrong option! Wait and try again..."
+            echo
+            sleep 2
+            clear
+            ;;
+    esac
+done

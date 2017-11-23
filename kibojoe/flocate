@@ -1,0 +1,151 @@
+#!/bin/bash
+#
+######################################################
+# Kibojoe Linux					     #
+# Updated 21.04.2017 10:58:31			     #
+# Version 0.1-1					     #
+# Name flocate ; File Locate System		     #
+# Use chmod +x flocate ; /usr/bin/kibojoe	     #
+# Credit Bulin Claude (Développement Sous GNU/Linux) #
+# Site http://www.xcfa.tuxfamily.org/                #
+# Adapted Holmes (Kibojoe Linux)		     #
+# Site http://kibojoe.org                            #
+# License Copyleft				     #
+######################################################
+
+function help_text() {
+	less 	<<-EOF
+Welcome to File Locate System's information page.
+FLocate is a bash GUI for mlocate.
+
+e - EXIT FLOCATE
+"clear && kill -9 -$PPID"
+This will exit FLocate and closes the sakura terminal.
+
+i - INFORMATION FLOCATE
+Display this information page.
+
+1 - UPDATE SYSTEM
+"sudo updatedb"
+This command is to update the mlocate database. This database contains information from all system files. 
+
+2 - LOCATE FOR SOMETHING
+"locate <FILE NAME>"
+The locate command will search for the specified file.
+
+3- IGNORE UPPERCASE/LOWERCASE
+"locate -i <FILE NAME>"
+In a search where you want to ignore uppercase and lowercase characters.
+
+4- SEARCH FOR SPECIFICATION
+"locate *<SPECIFICATION FILE>"
+Locate by file specification, for example: .txt, .doc, .opt, .exe, etc.
+
+5- RESTRICT THE OUTPUT
+"locate -l 5 <FILE NAME>"
+If you want to display only certain number of records, use locate -l option and specify how many records you want to see in the locate command output.
+In the FLocate work with 5 records for output.
+
+6- WIKI MLOCATE
+Visit the Gentoo wiki about mlocate.
+
+To exit this Help Page, press "q".
+	EOF
+}
+
+gost () {
+	clear
+	Description=`lsb_release -d`
+	release=`lsb_release -r`
+	codename=`lsb_release -c`
+        
+	echo ""
+	echo -e "                               File Locate System"
+        echo ""
+        echo -e "                           Locating everything for you!"
+	echo -e " ┌─────────────────────────────────────────────────────────────────────────┐"        
+	echo -e " │   ______ _                     _                                        │"
+	echo -e " │  |  ____| |                   | |                                       │"
+	echo -e " │  | |__  | |     ___   ___ __ _| |_ ___     "$Description"   │"
+	echo -e " │  |  __| | |    / _ \ / __/ _  | __/ _ \    "$release"            │"
+	echo -e " │  | |    | |___| (_) | (_| (_| | ||  __/    "$codename"                │"
+	echo -e " │  |_|    |______\___/ \___\__ _|\__\___|                                 │"
+        echo -e " │                                                                         │"
+	echo -e " │                                                                         │"
+	echo -e " │  1     Update Database                   2     Locate for Something     │"
+	echo -e " │  3	  Ignore Uppercase/Lowercase        4	  Search for Specification │"
+	echo -e " │  5	  Restrict the Output               6	  Wiki mlocate             │"
+	echo -e " └─────────────────────────────────────────────────────────────────────────┘"
+	echo ""
+	echo -e "       ✓ Select a number and press [Enter] ✓ e Exit ✓ i Information"
+	echo ""
+
+	read choix
+        case $choix in
+
+              1)
+		echo
+                sudo updatedb
+                echo
+                echo -e "Done! Return to FLocate press [Enter]"
+                read
+                ;;
+	      2)
+		echo -n " ▶ Please enter what you want to locate: "
+		read searchmsg
+		locate "$searchmsg"
+		echo 
+	        echo -e "Done! Return to FLocate press [Enter]" 
+	        read 
+		;;
+	      3)
+		echo -n " ▶ Please enter what you want to locate: "
+		read searchmsg
+		locate -i "$searchmsg"
+		echo 
+	        echo -e "Done! Return to FLocate press [Enter]" 
+	        read 
+		;;
+	      4)
+		echo -n " ▶ Please enter the file specification (i.e. .txt): " 
+		read searchmsg
+		locate *"$searchmsg"
+		echo 
+	        echo -e "Done! Return to FLocate press [Enter]" 
+	        read 
+		;;
+	      5)
+		echo -n " ▶ Please enter what you want to locate: "
+		read searchmsg
+		locate -l 5 "$searchmsg"
+		echo 
+	        echo -e "Done! Return to FLocate press [Enter]" 
+	        read 
+		;;
+	      6)
+		echo
+                $BROWSER https://wiki.gentoo.org/wiki/Mlocate
+                echo
+                echo -e "Homepage visited! Return to FLocate press [Enter]"
+                read
+                ;;
+	      e)
+		clear && kill -9 -$PPID
+		;;
+	      i)
+                echo
+                help_text
+                echo
+                ;;
+	      *)
+		echo "Wrong option! Wait and try again..."
+                echo
+                sleep 2
+                clear
+                ;;
+	esac
+}
+
+while [[ $BoolQuit -eq 0 ]]; do
+	gost
+done

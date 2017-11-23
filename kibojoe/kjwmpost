@@ -1,0 +1,543 @@
+#!/bin/bash
+#
+#############################################
+# Kibojoe Linux				    #
+# Updated 18.02.2017 23:34:49               #
+# Version 0.1-2 			    #
+# Name kjwmpost ; KJWM Post Installation    #
+# Use chmod +x kjwmpost ; /usr/bin/kibojoe  #
+# Credits Culinax (Manjaro Linux)           #
+# Modified Chrysostomus (Manjaro Linux)     #
+# Site http://polr.me/1gmj                  #
+# Adapted Holmes (Kibojoe Linux)            #
+# Site http://kibojoe.org                   #
+# License Copyleft 			    #
+#############################################
+
+PS3="▶ "
+
+in_array() {
+    local i
+    for i in "${@:2}"; do
+        [[ $i = "$1" ]] && return 0
+    done
+    return 1
+}
+
+slct() {
+    if in_array "--" "$@"; then
+        declare -A subopts subtitles
+        local sub subtitle subopt
+        until [[ $1 = "--" ]]; do
+            IFS=: read -r sub subtitle subopt<<< "$1"
+            subopts[$sub]=$subopt
+            subtitles[$sub]=$subtitle
+            shift
+        done
+        shift
+    fi
+
+    local title=$1
+    shift
+
+    local indent=0
+    for app in "$@"; do
+        (( ${#app} > indent )) && indent=${#app}
+    done
+
+    while true; do
+        local idx=1
+        print_title "$title"
+        printf '%s\n' "Select the correct number to either enable or disable a selection. Applications"\
+                      "marked with an * will be installed/reinstalled. Applications that are not marked"\
+                      "will not be installed or will be removed."
+        printf '\n%s\n\n' "0 =    Proceed to next step"
+        for app in "$@"; do
+            printf "%-$((${##}+1))s %s %-${indent}s %s\n" "${idx} =" "${work_list[${app}]:- }" "$app" "${apps_descr[$app]}"
+            ((idx++))
+        done
+        echo
+        while true; do
+            read -e -n ${##} -p "$PS3" REPLY
+
+            if [[ $REPLY != [0-9]* ]]; then
+                echo "Wrong option! Choose a number from 1 to 6 or r/q..."
+                continue
+            elif (( 10#$REPLY == 0 )); then
+                local quitslct=1
+                clear
+                break
+            elif (( 10#$REPLY >= 1 && 10#$REPLY <= $# )); then
+                opt=${!REPLY}
+                if in_array "${opt}" "${!work_list[@]}"; then
+                    unset work_list[${opt}]
+                    if in_array "$opt" "${!subopts[@]}"; then
+                        for app in ${subopts[$opt]}; do
+                            if in_array "$app" "${!work_list[@]}"; then
+                                unset work_list[$app]
+                            fi
+                        done
+                    fi
+                else
+                    work_list[${opt}]="*"
+                    if in_array "$opt" "${!subopts[@]}"; then
+                        clear
+                        slct "$title > ${subtitles[$opt]}" ${subopts[$opt]}
+                    fi
+                fi
+                clear
+                break
+            else
+                echo "Wrong option! Choose a number from 1 to 6 or r/q..."
+                continue
+            fi
+        done
+        (( quitslct == 1 )) && quitslct=0 && break
+    done
+}
+
+process_selections() {
+    local installation=() removal=()
+    for app in "${!work_list[@]}"; do
+        if ! in_array "${app}" "${!installed_list[@]}"; then
+            installation+=("${app,,}")
+        fi
+    done
+
+    clear
+    print_title "$1 ▶ Installing"
+    if (( ${#installation[@]} == 0 )); then
+        printf '%s\n\n' "No applications listed for installation. Press [Enter] to finish!"
+        while true; do
+            read -s -n 1 -p "$PS3" input
+            if [[ $input = "" ]]; then
+                break
+            else
+                echo "Press [Enter] to finish!"
+                continue
+            fi
+        done
+    else
+        if install_check i sudo pacman -S --needed --noconfirm "${installation[@]}"; then
+            for app in "${installation[@]}"; do
+                installed_list[$app]=
+            done
+        fi
+    fi
+
+    for app in "${!installed_list[@]}"; do
+        if ! in_array "${app}" "${!work_list[@]}"; then
+            removal+=("${app,,}")
+        fi
+    done
+
+    clear
+    print_title "$1 ▶ Removing"
+    if (( ${#removal[@]} == 0 )); then
+        printf '%s\n\n' "No applications listed for removal. Press [Enter] to finish!"
+        while true; do
+            read -s -n 1 -p "$PS3" input
+            if [[ $input = "" ]]; then
+                break
+            else
+                echo "Press [Enter] to finish!"
+                continue
+            fi
+        done
+    else
+        if install_check r sudo pacman -Rns "${removal[@]}"; then
+            for app in "${removal[@]}"; do
+                unset installed_list[$app]
+            done
+        fi
+    fi
+}
+
+install_check() {
+    if [[ $1 = "i" ]]; then
+        local todo="Installation"
+    elif [[ $1 = "r" ]]; then
+        local todo="Removal"
+    fi
+
+    if "${@:2}"; then
+        while true; do
+            printf '\n%s\n\n' "$todo finished successfully. Press [Enter] to finish!"
+            while true; do
+                read -s -n 1 -p "$PS3" input
+                if [[ $input = "" ]]; then
+                    return 0
+                else
+                    echo "Press [Enter] to finish!"
+                    continue
+                fi
+            done
+            break
+        done
+    else
+        while true; do
+            printf '%b\n' "\nIt seems like an error occured. Please analyze the output carefully to solve the problem."\
+                          "Press [Enter] to finish!\n"
+            while true; do
+                read -s -n 1 -p "$PS3" input
+                if [[ $input = "" ]]; then
+                    return 1
+                else
+                    echo "Press [Enter] to finish!"
+                    continue
+                fi
+            done
+            break
+        done
+    fi
+}
+
+print_title() {
+    printf "\033[38;5;160mKJWM Post Installation%s\033[0m\n\n" "$@"
+}
+
+print_main() {
+    printf '%b\n' "Welcome to Kibojoe Linux, you're in the KJWM Post Installation.\n"\
+                  "The purpose of this post installation script is to automate common tasks which"\
+                  "should help you to get you started using your brand new installation.\n"\
+                  "It is by no means mandatory to run this script, however it is recommended to go"\
+                  "throught this script once, as it is a very helpful addition. It is recommended"\
+                  "to start from the first step and then work your way down. Use with care!\n"
+
+}
+
+main() {
+    while true; do
+        clear
+        print_title
+        print_main
+        printf '%b\n' "1 = Optimize mirrors and update system"\
+                      "2 = Install and configure firewall"\
+                      "3 = AUR support"\
+                      "4 = Multimedia support"\
+                      "5 = Printer drivers"\
+                      "6 = Install applications sorted by category"\
+                      "r = Never display at boot again"\
+                      "q = Quit\n"
+        while true; do
+            read -s -n 1 -p "$PS3" REPLY
+            case "$REPLY" in
+                1)  clear
+                    rank_sync_update
+                    clear
+                    break
+                    ;;
+                2)  clear
+                    install_firewall
+                    clear
+                    break
+                    ;;
+                3)  clear
+                    install_aur
+                    clear
+                    break
+                    ;;
+                4)  clear
+                    install_media
+                    clear
+                    break
+                    ;;
+                5)  clear
+                    install_printer
+                    clear
+                    break
+                    ;;                        
+                6)  clear
+                    install_apps
+                    clear
+                    break
+                    ;;
+                r)  remove_from_startup
+                    ;;
+                q)  quit
+                    ;;
+                *)  echo "Wrong option! Choose a number from 1 to 6 or r/q..."
+                    continue
+                    ;;
+            esac
+        done
+    done
+}
+
+rank_sync_update(){
+    print_title " ▶ Optimize Mirrors and Update"
+    sudo pacman-mirrors -f 0 && sudo pacman -Syyu
+}
+
+install_firewall(){
+    print_title " ▶ Install and Config Firewall"
+    sudo pacman -S --needed --noconfirm ufw && sudo systemctl enable ufw -f && sudo systemctl start ufw && sudo ufw enable && sudo ufw status
+}
+
+install_aur(){
+    print_title " ▶ AUR Support"
+    sudo pacman -S --needed --noconfirm autoconf automake binutils bison fakeroot flex gcc gcc-multilib libtool m4 make patch pkg-config lib32-flex yaourt
+}
+
+install_media(){
+    print_title " ▶ Multimedia Support"
+    sudo pacman -S --needed --noconfirm gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly gstreamer flashplugin libdvdcss flac jre8-openjdk jre8-openjdk-headless icedtea-web
+}
+
+install_printer(){
+    print_title " ▶ Printer Drivers"
+    sudo pacman -S --needed --noconfirm manjaro-printer && sudo systemctl enable org.cups.cupsd.service && sudo systemctl start org.cups.cupsd.service
+}
+
+install_apps() {
+    local subtitle=" ▶ Install Applications"
+
+    slct "$subtitle ▶ Calendars" "${apps_cal[@]}"
+    slct "$subtitle ▶ CD/DVD Burners" "${apps_cddvd[@]}"
+    slct "$subtitle ▶ Chat Clients" "${apps_chat[@]}"
+    slct "$subtitle ▶ Email Clients" "${apps_email[@]}"
+    slct "$subtitle ▶ Games" "${apps_games[@]}"
+    slct "$subtitle ▶ Graphic Manipulation" "${apps_graphic[@]}"
+    slct "$subtitle ▶ Image Viewers" "${apps_imgview[@]}"
+    slct "$subtitle ▶ IRC Clients" "${apps_irc[@]}"
+    slct "Nautilus:Nautilus:${apps_nautilus[*]}"\
+         "SpaceFM:SpaceFM:${apps_spacefm[*]}"\
+         "Thunar:Thunar:${apps_thunar[*]}"\
+         -- "$subtitle ▶ File Managers" "${apps_file[@]}"
+    slct "MPD:MPD Clients:${apps_mpd[*]}"\
+         -- "$subtitle ▶ Music Players" "${apps_music[@]}"
+    slct "$subtitle ▶ Office Apps" "${apps_office[@]}"
+    slct "$subtitle ▶ PDF Readers" "${apps_pdf[@]}"
+    slct "$subtitle ▶ RSS Readers" "${apps_rss[@]}"
+    slct "$subtitle ▶ System Monitoring" "${apps_sysmon[@]}"
+    slct "$subtitle ▶ System Tool" "${apps_systoo[@]}"
+    slct "$subtitle ▶ Terminal Emulators" "${apps_term[@]}"
+    slct "$subtitle ▶ Text Editors" "${apps_text[@]}"
+    slct "$subtitle ▶ Torrent Clients" "${apps_torrent[@]}"
+    slct "$subtitle ▶ Utilities" "${apps_util[@]}"
+    slct "$subtitle ▶ Video Players" "${apps_video[@]}"
+    slct "$subtitle ▶ Web Browsers" "${apps_web[@]}"
+    
+    local installation=() removal=()
+    for app in "${!work_list[@]}"; do
+        if ! in_array "${app}" "${!installed_list[@]}"; then
+            installation+=("$app")
+        fi
+    done
+    (( ${#installation[@]} != 0 )) && slct "$subtitle ▶ Review Installation List" "${installation[@]}"
+
+    for app in "${!installed_list[@]}"; do
+        if ! in_array "${app}" "${!work_list[@]}"; then
+            removal+=("$app")
+        fi
+    done
+    (( ${#removal[@]} != 0 )) && slct "$subtitle ▶ Review Removal List" "${removal[@]}"
+
+    process_selections "$subtitle"
+}
+
+IFS=. read -r major minor _ <<< "$(uname -r)"
+local_configs=(".gtkrc-2.0" ".config/gtk-3.0" ".bashrc")
+
+apps_cal=("calcurse" "wyrd")
+apps_cddvd=("brasero" "k3b" "xfburn")
+apps_chat=("bitlbee" "pidgin" "skype")
+apps_email=("claws-mail" "evolution" "mutt" "thunderbird" "trojita")
+apps_file=("dolphin" "mc" "nautilus" "ranger" "spacefm" "sunflower" "rox" "thunar")
+apps_graphic=("blender" "gimp" "imagemagick" "inkscape")
+apps_imgview=("gpicview" "mirage" "sxiv" "viewnior")
+apps_irc=("irssi" "weechat")
+apps_mpd=("mpc" "ncmpcpp" "sonata")
+apps_music=("amarok" "audacious" "banshee" "clementine" "cmus" "moc" "mpd" "rhythmbox")
+apps_nautilus=("nautilus-actions" "nautilius-terminal" "nautilus-open-terminal" "seahorse-nautilus")
+apps_office=("calligra" "libreoffice-fresh" "libreoffice-still" "wps-office")
+apps_pcmanfm=("gvfs")
+apps_pdf=("evince" "mupdf" "zathura-pdf-mupdf" "zathura-pdf-poppler" "xpdf")
+apps_rss=("liferea" "newsbeuter")
+apps_spacefm=("udevil")
+apps_sysmon=("baobab" "gdmap")
+apps_systoo=("filezilla" "octopi" "octopi-notifier-frameworks" "octopi-cachecleaner" "octopi-repoeditor" "pamac" "virtualbox")
+apps_term=("deepin-terminal" "gnome-terminal" "guake" "lilyterm" "lxterminal" "roxterm" "terminator" "tilda" "xfce4-terminal")
+apps_text=("emacs" "geany" "gedit" "gvim" "vim")
+apps_thunar=("gvfs" "thunar-archive-plugin" "thunar-media-tags-plugin" "thunar-volman" "tumbler")
+apps_torrent=("deluge" "qbittorrent" "rtorrent" "transmission-cli" "transmission-gtk" "transmission-remote-cli" "transmission-qt")
+apps_util=("bleachbit" "galculator" "nitrogen" "parcellite" "tmux")
+apps_video=("gnome-mplayer" "lxmusic" "mpv" "smplayer" "vlc")
+apps_web=("chromium" "dwb" "firefox" "qupzilla" "qutebrowser" "luakit" "opera" "uzbl-tabbed")
+apps_games=("desmume" "pcsx2" "pcsxr" "ppsspp" "snes9x-gtk" "steam-manjaro" "stella" "vbam-gtk" "yabause-gtk")
+
+declare -A apps_des=( 
+    ["amarok"]="The powerful music player"
+    ["audacious"]="Lightweight, advanced audio player"
+    ["baobab"]="Analyse space of the disk"
+    ["banshee"]="Music management and playback"
+    ["bitlbee"]="Brings instant messaging"
+    ["bleachbit"]="Deletes files of the disk"
+    ["blender"]="A suite of 3D graphics creation"
+    ["brasero"]="A disc burning application"
+    ["calcurse"]="A text-based personal organizer"
+    ["calligra"]="Actively developed fork of KOffice"
+    ["chromium"]="The open-source project behind Google Chrome"
+    ["claws-mail"]="Lightweight GTK-based email client and news reader"
+    ["clementine"]="The powerful music player"
+    ["cmus"]="Feature-rich ncurses-based music player"
+    ["desmume"]="Nintendo DS emulator"
+    ["deepin-terminal"]="Default terminal emulation application for Deepin"
+    ["deluge"]="A BitTorrent client with multiple interfaces"
+    ["dolphin"]="File Manager"
+    ["dwb"]="A webkit web browser with vi-like keyboard shortcuts"
+    ["emacs"]="The extensible, customizable, self-documenting real-time display editor"
+    ["evince"]="Simply a document viewer"
+    ["evolution"]="Manage your email, contacts and schedule"
+    ["firefox"]="Standalone web browser from mozilla.org"
+    ["filezilla"]="Fast and reliable FTP, FTPS and SFTP client"
+    ["galculator"]="GTK+ based scientific calculator"
+    ["gdmap"]="Is a tool which allows to visualize disk space"
+    ["geany"]="Fast and lightweight IDE"
+    ["gedit"]="A text editor for GNOME"
+    ["gimp"]="GNU Image Manipulation Program"
+    ["gnome-mplayer"]="A simple MPlayer GUI"
+    ["gnome-terminal"]="The GNOME Terminal Emulator"
+    ["gpicview"]="lightweight image viewer"
+    ["gvfs"]="For trash support, mounting with udisk and remote filesystems"
+    ["gvim"]="Vi Improved (with features, such as a GUI)"
+    ["guake"]="Drop-down terminal for the GNOME desktop"
+    ["imagemagick"]="An image viewing/manipulation program"
+    ["inkscape"]="Vector graphics editor using the SVG file format"
+    ["irssi"]="Modular text mode IRC client with Perl scripting"
+    ["k3b"]="Feature-rich and easy to handle CD burning application"
+    ["libreoffice-fresh"]="A productivity suite that is compatible with other major office suites"
+    ["libreoffice-still"]="A productivity suite that is compatible with other major office suites"
+    ["liferea"]="A desktop news aggregator for online news feeds and weblogs"
+    ["lilyterm"]="A light and easy to use libvte based X terminal emulator"
+    ["luakit"]="Fast, small, webkit based browser framework extensible by Lua"
+    ["lxterminal"]="VTE-based terminal emulator (part of LXDE)"
+    ["lxmusic"]="Full featured media player that can easily manage large collections and uses the GStreamer media framework"
+    ["mc"]="Midnight Commander is a text based filemanager/shell that emulates Norton Commander"
+    ["mirage"]="A simple GTK+ Image Viewer"
+    ["moc"]="An ncurses console audio player designed to be powerful and easy to use"
+    ["mpc"]="Minimalist command line interface to MPD"
+    ["mpd"]="Flexible, powerful, server-side application for playing music"
+    ["mpv"]="Video player based on MPlayer/mplayer2"
+    ["mupdf"]="Lightweight PDF and XPS viewer"
+    ["mutt"]="Small but very powerful text-based mail client"
+    ["nautilus"]="GNOME file manager"
+    ["nautilus-actions"]="Configures programs to be launched when files are selected in Nautilus"
+    ["nautilus-open-terminal"]="A nautilus plugin for opening terminals in arbitrary local paths"
+    ["nautilus-terminal"]="An integrated terminal for Nautilus"
+    ["ncmpcpp"]="Almost exact clone of ncmpc with some new features"
+    ["newsbeuter"]="A RSS feed reader for the text console with special Podcast support"
+    ["octopi"]="Octopi is a GUI package manager built on Qt"
+    ["octopi-notifier-frameworks"]="Octopi accessory notifier"
+    ["octopi-cachecleaner"]="Octopi accessory cachecleaner"
+    ["octopi-repoeditor"]="Octopi accessory repoeditor"
+    ["opera"]="Fast and secure web browser and internet suite"
+    ["nitrogen"]="Background browser and setter for X windows"
+    ["parcellite"]="Lightweight GTK+ clipboard manager"
+    ["pidgin"]="Multi-protocol instant messaging client"
+    ["pcsx2"]="A Sony PlayStation 2 emulator"
+    ["pcsxr"]="A Sony PlayStation (PSX) emulator based on the PCSX-df project"
+    ["ppsspp"]="A PSP emulator written in C++"
+    ["qbittorrent"]="Open source (GPLv2) BitTorrent client that strongly resembles µtorrent"
+    ["qupzilla"]="Cross-platform QtWebEngine browser"
+    ["qutebrowser"]="A keyboard-driven, vim-like browser based on PyQt5 and QtWebKit"
+    ["ranger"]="A simple, vim-like file manager"
+    ["rhythmbox"]="An iTunes-like music playback and management application"
+    ["rtorrent"]="Ncurses BitTorrent client based on libTorrent"
+    ["roxterm"]="Tabbed terminal emulator with a small footprint"
+    ["rox"]="Small and fast file manager which can optionally manage the desktop background and panels"
+    ["seahorse-nautilus"]="PGP encryption and signing for nautilus"
+    ["skype"]="P2P software for high-quality voice communication"
+    ["smplayer"]="A complete front-end for MPlayer"
+    ["sonata"]="Elegant GTK+ music client for MPD"
+    ["spacefm"]="Multi-panel tabbed file manager"
+    ["sunflower"]="Small and highly customizable twin-panel file manager for Linux with support for plugins"
+    ["sxiv"]="Simple X Image Viewer"
+    ["steam-manjaro"]="A steam-manjaro in system"
+    ["stella"]="Atari 2600 VCS emulator"
+    ["terminator"]="Terminal emulator that supports tabs and grids"
+    ["thunar"]="Modern file manager for Xfce"
+    ["thunar-archive-plugin"]="Create and deflate archives"
+    ["thunar-media-tags-plugin"]="View/edit id3/ogg tags"
+    ["thunar-volman"]="Manages removable devices"
+    ["thunderbird"]="Standalone Mail/News reader"
+    ["tilda"]="Terminal inspired by many classic terminals from first person shooter games such as Quake, Doom and Half-Life"
+    ["trojita"]="Qt IMAP email client"
+    ["tmux"]="A terminal multiplexer"
+    ["transmission-cli"]="Fast, easy, and free BitTorrent client (CLI tools, daemon and web client)"
+    ["transmission-gtk"]="Fast, easy, and free BitTorrent client (GTK+ GUI)"
+    ["transmission-qt"]="Fast, easy, and free BitTorrent client (Qt GUI)"
+    ["transmission-remote-cli"]="Curses interface for the daemon of the BitTorrent client Transmission"
+    ["tumbler"]="For thumbnail previews"
+    ["udevil"]="Mount as non-root user and mount networks"
+    ["uzbl-tabbed"]="Tabbing manager providing multiple uzbl-browser instances in 1 window"
+    ["vbam-gtk"]="Nintendo GameBoy Advance emulator"
+    ["viewnior"]="A simple, fast and elegant image viewer program"
+    ["vim"]="Vi Improved, a highly configurable, improved version of the vi text editor"
+    ["virtualbox"]="Powerful virtualization for enterprise as well as home use"
+    ["vlc"]="A multi-platform MPEG, VCD/DVD, and DivX player"
+    ["wps-office"]="Kingsoft Office suite"    
+    ["weechat"]="Fast, light and extensible IRC client (curses UI)"
+    ["wyrd"]="A text-based front-end to Remind."
+    ["xfburn"]="A simple CD/DVD burning tool based on libburnia libraries"
+    ["xfce4-terminal"]="A modern terminal emulator primarly for the Xfce desktop environment"
+    ["xpdf"]="Viewer for Portable Document Format (PDF files)"
+    ["yabause-gtk"]="A Sega Saturn emulator"
+    ["zathura-pdf-mupdf"]="Adds pdf support to zathura by using the mupdf library"
+    ["zathura-pdf-poppler"]="Adds pdf support to zathura by using the poppler engine"
+)
+
+remove_from_startup() {
+    for file in "$HOME/.local/share/applications/kjwmpost.desktop"\
+                "$HOME/.config/autostart/kjwmpost.desktop"; do
+        [[ -f $file ]] && rm "$file"
+    done
+    echo "KJWMPostI will now no longer be auto-started."
+}
+
+quit() {
+    printf '%b\n' "\nThank you for using KJWMPostI! Come back soon..."
+    while true; do
+        read -s -n 1 -p "Press [Enter] to quit!"$'\n' input
+        if [[ $input = "" ]]; then
+            clear && kill -9 -$PPID
+        else
+            printf '\n%s\n\n' "Quitting has been canceled"
+            break
+        fi
+    done
+}
+
+clear
+print_title
+print_main
+printf '%b\n' "It is necessary for this script that an internet conncetion is available. Please"\
+              "make sure that you have a working connection before you continue. Press [Enter]"\
+              "to perform a connection check!\n"
+
+declare -A work_list installed_list
+pacman_query="$(pacman -Qq)"
+for app in "${!apps_des[@]}"; do
+    if echo "$pacman_query" | grep -q "^${app,,}$"; then
+        work_list[$app]="*"
+        installed_list[$app]=
+    fi
+done
+
+while true; do
+	read -s -n 1 -p "$PS3" input
+	if [[ $input = "" ]]; then
+	    if curl -D - https://www.google.com &> /dev/null; then
+		echo "Connection check succeeded..."
+		sleep 1
+		main
+	     else
+		printf '%s\n' "Connection check failed... Please connect to the internet and press [Enter] to"\
+			      "run a connection check again."
+		continue
+	     fi
+	else
+	     echo "Press [Enter] to run a connection check."
+	     continue
+	fi
+done
