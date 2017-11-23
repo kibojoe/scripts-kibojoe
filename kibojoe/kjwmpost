@@ -118,7 +118,7 @@ process_selections() {
             fi
         done
     else
-        if install_check i sudo pacman -S --needed --noconfirm "${installation[@]}"; then
+        if install_check i sudo pacman -S "${installation[@]}"; then
             for app in "${installation[@]}"; do
                 installed_list[$app]=
             done
@@ -271,22 +271,22 @@ rank_sync_update(){
 
 install_firewall(){
     print_title " ▶ Install and Config Firewall"
-    sudo pacman -S --needed --noconfirm ufw && sudo systemctl enable ufw -f && sudo systemctl start ufw && sudo ufw enable && sudo ufw status
+    sudo pacman -S ufw && sudo systemctl enable ufw -f && sudo systemctl start ufw && sudo ufw enable && sudo ufw status
 }
 
 install_aur(){
     print_title " ▶ AUR Support"
-    sudo pacman -S --needed --noconfirm autoconf automake binutils bison fakeroot flex gcc gcc-multilib libtool m4 make patch pkg-config lib32-flex yaourt
+    sudo pacman -S autoconf automake binutils bison fakeroot flex gcc gcc-libs-multilib gcc-multilib m4 make patch subversion yaourt
 }
 
 install_media(){
     print_title " ▶ Multimedia Support"
-    sudo pacman -S --needed --noconfirm gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly flashplugin libdvdcss jre8-openjdk jre8-openjdk-headless icedtea-web
+    sudo pacman -S gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly flashplugin libdvdcss jre8-openjdk jre8-openjdk-headless icedtea-web
 }
 
 install_printer(){
     print_title " ▶ Printer Drivers"
-    sudo pacman -S --needed --noconfirm manjaro-printer && sudo systemctl enable org.cups.cupsd.service && sudo systemctl start org.cups.cupsd.service
+    sudo pacman -S manjaro-printer && sudo systemctl enable org.cups.cupsd.service && sudo systemctl start org.cups.cupsd.service
 }
 
 install_apps() {
