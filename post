@@ -4,6 +4,6 @@ git add *
 echo -n "Please enter commit message: "
 read commitmsg
 git commit -a -m "$commitmsg"
-git push origin master
+git push -f origin master
 sleep 2
 clear && kill -9 -$PPID
