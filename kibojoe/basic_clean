@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+######################################################
+# Kibojoe Linux					     #
+# Updated 29.11.2017 22:58:31			     #
+# Version 0.1-1					     #
+# Name basic_clean ; Basic Cleaning		     #
+# Use chmod +x basic_clean ; /usr/bin/kibojoe	     #
+# Credit Holmes (Kibojoe Linux)			     #
+# Site http://kibojoe.org                            #
+# License Copyleft				     #
+######################################################
+
+sudo rm -rf /root/.local/share/*
+rm -rf /$HOME/.local/share/Trash/files/*
+rm -rf /$HOME/.cache/*
+rm -rf /$HOME/.adobe/*				# Flash crap
+rm -rf /$HOME/.macromedia/*		        # Flash crap
+rm -rf /$HOME/.dbus/*
+rm -rf /$HOME/.thumbnails/*
+rm -rf /$HOME/.java/*
+rm -rf /$HOME/.pulse/*
+rm -rf /$HOME/.gconf/*
+rm -rf /$HOME/.gconfd/*
+rm -rf /$HOME/.parallel/*
+rm -rf /$HOME/wget*				# Polluted wget-log files
+
+echo "Done basic cleaning...!"
+sleep 2
+clear && kill -9 -$PPID

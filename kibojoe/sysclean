@@ -2,8 +2,8 @@
 #
 ##################################################################
 # Kibojoe Linux 					         #
-# Updated 18.02.2017 19:23:01 					 #
-# Version 0.1-1 						 #
+# Updated 29.11.2017 15:24:09 					 #
+# Version 0.1-2 						 #
 # Name sysclean ; System Cleanup GNU/Linux	 		 #
 # Use chmod +x sysclean ; /usr/bin/kibojoe			 #
 # Link pacli 							 #
@@ -20,7 +20,7 @@ Welcome to System Cleanup GNU/Linux information page.
 SysClean is a script that works with some commands that help clean the system.
 
 ATTENTION
-*The number 8, 9, 10, 11, 12 and 13 can break your system. WARNING! USE WITH CAUTION.
+*The number 10, 11, 12, 13, 14, 15, 16 and 17 can break your system. WARNING! USE WITH CAUTION.
 
 e - EXIT SysClean
 "clear && exit"
@@ -55,47 +55,61 @@ The above commands will look for how many empty files there are and what are the
 "find ~ -type d -empty -print"
 The above commands will look for how many empty folders there are and what are these files in the /home.
 
-6 - LIMITED LOG JOURNALCTL
+6- LIST BRONKEN SYSLINKS
+"find -xtype l -print"
+Old, broken symbolic links might be sitting around your system; you should remove them!
+
+7 - LIMITED LOG JOURNALCTL
 "sudo journalctl --vacuum-size=50M --vacuum-time=30days"
 This command limits all log files in journalctl to a combined size of 50 megabytes and a maximum age of 30 days. This leaves plenty of log files behind to analyze systematic and reoccuring errors while preventing excessive amounts of log files.
-
-7 - CLEANING OF THE DAY
-"yaourt -Scc"
-This command will empty your entire package cache by deleting ALL packages.
-Attention: This will make it impossible to reinstall or DOWNGRADE PACKAGES without a working internet connection.
 
 8 - PROFILE CLEANER BROWSER
 "profile-cleaner pm"
 Use profile-cleaner to reduce the size of browser profiles by organizing their sqlite databases using sqlite3's vacuum and reindex functions. 
 
-9 - FORCE REMOVE PACKAGE
+9 - BASIC CLEANING
+"/usr/bin/kibojoe/fast_clean"
+The script basic_clean remove the contents of the following folders (you can add more folders):
+"sudo rm -rf /root/.local/share/*
+rm -rf /$HOME/.local/share/Trash/files/*
+rm -rf /$HOME/.cache/*
+rm -rf /$HOME/.adobe/*
+rm -rf /$HOME/.dbus/*
+rm -rf /$HOME/.thumbnails/*
+rm -rf /$HOME/.java/*"
+
+10 - FORCE REMOVE PACKAGE
 "pacman -Rdd <PACKAGE NAME>"
 This command removes <PACKAGE NAME> without checking the dependencies of <PACKAGE NAME> first. This enables experienced users to remove packages and dependencies of packages. This command only removes <PACKAGE NAME> from your system. All dependencies and orphans are left: run REMOVE ORPHANED PACKAGES afterwards to remove them, too.
 Attention: This command can break pacakges on your system or even your entire system. Use with great care!
 
-10 - REMOVE ORPHAN BY STAGES
+11 - REMOVE ORPHAN BY STAGES
 "/usr/bin/undeps -r"
 Removes unnecessary dependencies in stages.
 
-11 - REMOVE ORPHAN RECURSIVE
+12 - REMOVE ORPHAN RECURSIVE
 "/usr/bin/kibojoe/undeps -ra"
 Remove all unnecessary dependencies at once (recursively).
 
-12 - REMOVE EMPTY FILES
+13 - REMOVE EMPTY FILES
 "/usr/bin/kibojoe/empty_fileclean"
 The above command will remove all empty files in the /home.
 
-13 - REMOVE EMPTY FOLDRES
+14 - REMOVE EMPTY FOLDRES
 "/usr/bin/empty_folderclean"
 The above command will remove all empty folders in the /home.
 
-14 - REMOVE PACKAGE CACHE
+15 - REMOVE BROKEN SYMLINKS
+"find -xtype l -delete"
+Removed the broken symlinks listed in the option 6 (LIST BRONKEN SYSLINKS).
+
+16 - REMOVE PACKAGE CACHE
 "paccache -ruvk1
 paccache -rvk2"
 By default Pacman uses this cache direcoty for downloading packages: /var/cache/pacman/pkg/. No cached packages get deleted automatically. This enables you to DOWNGRADE PACKAGES, which are broken, without a working internet connection. The package cache of an old and actively used Manjaro installation can become quite large. Clean it to regain space on your root partition.
 The first command removes all packages from cache, which are not installed (anymore) on your system. The second command removes all old packages from your cache except the 2 latest versions: The version you have currently installed on your system and the previous version.
 
-15 - REMOVE UNINSTALLED CACHE 
+17 - REMOVE UNINSTALLED CACHE 
 "paccache -dvuk0
 paccache -rvuk0"
 The commands view the files of the uninstalled packages and remove the files from the uninstalled packages /var/cache/pacman/pkg/.
@@ -113,13 +127,14 @@ To exit this information page, press "q".
     echo -e " ┌─────────────────────────────────────────────────────────────────────────┐"
     echo -e " │    1   Remove Package + Deps	           2   List Removed Packages       │"
     echo -e " │    3   List Orphan Packages		   4   List Empty Files	           │"
-    echo -e " │    5   List Empty Folders               6   Limit Log Journalctl        │"
-    echo -e " │    7   Cleaning of the Day              8   Profile Cleaner Browser     │"
+    echo -e " │    5   List Empty Folders               6   List Broken Symlinks        │"
+    echo -e " │    7   Limit Log Journalctl             8   Profile Cleaner Browser     │"
+    echo -e " │    9   Basic Cleaning                                                   │"
     echo -e " │-------------------------------------------------------------------------│"
-    echo -e " │    9  *Force Remove Package            10  *Remove Orphan by Stages     │"
-    echo -e " │   11  *Remove Orphan Recursive         12  *Remove Empty Files          │"
-    echo -e " │   13  *Remove Empty Folders            14  *Remove Package Cache        │"
-    echo -e " │   15  *Remove Uninstalled Cache 				           │"    
+    echo -e " │   10  *Force Remove Package            11  *Remove Orphan by Stages     │"
+    echo -e " │   12  *Remove Orphan Recursive         13  *Remove Empty Files          │"
+    echo -e " │   14  *Remove Empty Folders            15  *Remove Broken Symlinks      │"
+    echo -e " │   16  *Remove Package Cache            17  *Remove Uninstalled Cache    │"   
     echo -e " └─────────────────────────────────────────────────────────────────────────┘"
     echo ""    
     echo -e "       ✓ Select a number and press [Enter] ✓ e Exit ✓ i Information"
@@ -169,18 +184,18 @@ To exit this information page, press "q".
             echo -e "List empty folders listed! Return to SysClean press [Enter]"
             read
             ;;
-           6)
+	   6)
+	    echo
+            find -xtype l -print
             echo
+            echo -e "List broken symlinks listed! Return to SysClean press [Enter]"
+            read
+	    ;; 
+           7)
+	    echo
             sudo journalctl --vacuum-size=50M --vacuum-time=30days
             echo
             echo -e "Log journalctl limited! Return to SysClean press [Enter]"
-            read
-            ;;
-           7)
-            echo
-            yaourt -Scc
-            echo
-            echo -e "Cleaning performed! Return to SysClean press [Enter]"
             read
             ;;
 	   8)
@@ -190,42 +205,56 @@ To exit this information page, press "q".
             echo -e "Profile has been cleared for Palemoon! Return to SysClean press [Enter]"
             read
             ;;	    
-           9)
+	   9)
+	    echo
+            /usr/bin/kibojoe/basic_clean
+            echo
+            echo -e "Done basic cleaning! Return to SysClean press [Enter]"
+            read
+            ;;
+	  10)
             echo
             sudo pacman -Rdd $(pacman -Qq | fzf --color fg:#ffffff,fg+:#215d9c,prompt:#ffffff,info:#c0392b,pointer:#c0392b,spinner:#c0392b --reverse --prompt='Select package to remove (toggle selection with TAB) ▶ ') --color always
             echo
             echo -e "Dependency in force mode removed! Return to Pacli press [Enter]"
             read
             ;;
-	  10)
+	  11)
             echo
             /usr/bin/kibojoe/undeps -r
             echo
             echo -e "Orphan by stages removed! Return to SysClean press [Enter]"
             read
             ;;
-	  11)
+	  12)
             echo
             /usr/bin/kibojoe/undeps -ra
             echo
             echo -e "Orphan recursive removed! Return to SysClean press [Enter]"
             read
             ;;
-          12)
+          13)
 	    echo
             /usr/bin/kibojoe/empty_fileclean
             echo
             echo -e "Empty files removed! Return to SysClean press [Enter]"
             read
             ;;  
-          13)
+          14)
 	    echo
             /usr/bin/kibojoe/empty_folderclean
             echo
             echo -e "Empty folders renoved! Return to SysClean press [Enter]"
             read
             ;;
-          14)
+	  15)
+	    echo
+            find -xtype l -delete
+            echo
+            echo -e "Removed the broken symlinks listed! Return to SysClean press [Enter]"
+            read
+	    ;;
+          16)
             echo
             paccache -ruvk1
 	    paccache -rvk3
@@ -233,7 +262,7 @@ To exit this information page, press "q".
             echo -e "Package cache removed! Return to SysClean press [Enter]"
             read
             ;;
-	  15)
+	  17)
             echo
             paccache -dvuk0
 	    paccache -rvuk0
