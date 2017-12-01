@@ -11,19 +11,20 @@
 # License Copyleft				     #
 ######################################################
 
-sudo rm -rf /root/.local/share/*
-rm -rf /$HOME/.local/share/Trash/files/*
-rm -rf /$HOME/.cache/*
-rm -rf /$HOME/.adobe/*				# Flash crap
-rm -rf /$HOME/.macromedia/*		        # Flash crap
-rm -rf /$HOME/.dbus/*
-rm -rf /$HOME/.thumbnails/*
-rm -rf /$HOME/.java/*
-rm -rf /$HOME/.pulse/*
-rm -rf /$HOME/.gconf/*
-rm -rf /$HOME/.gconfd/*
-rm -rf /$HOME/.parallel/*
-rm -rf /$HOME/wget*				# Polluted wget-log files
+sudo rm -rf /root/.local/share/Trash/files	# Empty trash root
+sudo rm -rf /root/.local/share/Trash/info	# Empty trash root
+rm -rf ~/.local/share/Trash/*
+rm -rf ~/.cache/*
+rm -rf ~/.adobe/*				# Flash crap
+rm -rf ~/.macromedia/*				# Flash crap
+rm -rf ~/.dbus/*
+rm -rf ~/.thumbnails/*
+rm -rf ~/.java/*
+rm -rf ~/.pulse/*
+rm -rf ~/.gconf/*
+rm -rf ~/.gconfd/*
+rm -rf ~/.parallel/*
+rm -rf ~/wget*					# Polluted wget-log files
 
 echo "Done basic cleaning...!"
 sleep 2
