@@ -2,9 +2,9 @@
 
 pkgname=scripts-kibojoe
 pkgver=1709
-pkgrel=9
+pkgrel=8
 pkgdesc="Scripts for Kibojoe Linux"
-arch=('any')
+arch=('x86_64')
 license=('GPL3')
 url="https://github.com/kibojoe/scripts-kibojoe"
 source=("git+$url.git")
