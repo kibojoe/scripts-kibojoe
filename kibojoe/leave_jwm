@@ -36,6 +36,6 @@ case $question in
         systemctl suspend
         ;;
     *Cancel)
-        clear && kill -9 -$PPID
+        clear
         ;;   
 esac
