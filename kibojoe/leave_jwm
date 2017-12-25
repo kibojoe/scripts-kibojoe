@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+##############################################
+# Kibojoe Linux				     #
+# Updated 24.12.2017 22:38:14 		     #
+# Version 0.1-1 		             #
+# Name leave_jwm ; Leave Kibojoe System      #
+# Use chmod +x leave_jwm ; /usr/bin/kibojoe  #
+# Credits ArchLabs			     #
+# Site https://archlabslinux.com/            #
+# Adapted Holmes (Kibojoe Linux)	     #
+# Site http://kibojoe.org                    #
+# License Copyleft 			     #
+##############################################
+
+question=$(echo "✓ Logout|✓ Lock|✓ Reboot|✓ Shutdown|✓ Suspend|✓ Cancel" | rofi -sep "|" \
+    -dmenu -i -p 'Options Leave: ' "" -width 16 -hide-scrollbar -font "Cantarell 10" \
+    -eh 1 -line-padding 6 -padding 16 -no-config -lines 6 -color-enabled \
+    -color-window "#444444, #6d6d6d, #444444" \
+    -color-normal "#444444, #e5e5e5, #444444, #6d6d6d, #444444")
+
+case $question in
+    *Logout)
+        jwm -exit
+        ;;
+    *Lock)
+        i3lock -c 444444
+        ;;
+    *Reboot)
+        systemctl reboot
+        ;;
+    *Shutdown)
+        systemctl poweroff
+        ;;
+    *Suspend)
+        systemctl suspend
+        ;;
+    *Cancel)
+        clear && kill -9 -$PPID
+        ;;   
+esac
