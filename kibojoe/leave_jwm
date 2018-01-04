@@ -16,7 +16,7 @@
 question=$(echo "✓ Logout|✓ Lock|✓ Reboot|✓ Shutdown|✓ Suspend|✓ Cancel" | rofi -sep "|" \
     -dmenu -i -p 'Options Leave: ' "" -width 16 -hide-scrollbar -font "Cantarell 10" \
     -eh 1 -line-padding 6 -padding 16 -no-config -lines 6 -color-enabled \
-    -color-window "#444444, #6d6d6d, #444444" \
+    -color-window "#444444, #444444, #444444" \
     -color-normal "#444444, #e5e5e5, #444444, #6d6d6d, #444444")
 
 case $question in
