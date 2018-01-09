@@ -127,7 +127,7 @@ function input {
     echo -e " │   11   Wiki mhwd-driver 	 					   │"    
     echo -e " │-------------------------------------------------------------------------│"
     echo -e " │   12   List All Users		  13   Add a User	           │"
-    echo -e " │   14   Remove a user		          15   Wiki users-groups	   │"
+    echo -e " │   14   Remove a User		          15   Wiki users-groups	   │"
     echo -e " └─────────────────────────────────────────────────────────────────────────┘"
     echo ""    
     echo -e "       ✓ Select a number and press [Enter] ✓ e Exit ✓ i Information"
