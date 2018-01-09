@@ -2,8 +2,8 @@
 #
 ##################################################################
 # Kibojoe Linux						         #
-# Updated 18.02.2017 18:23:49 					 #
-# Version 0.1-5 						 #
+# Version 2		 					 #
+# Updated Jan. 2018						 #
 # Name jwmconf ; JWMConf Configuration Tool 			 #
 # Use chmod +x jwmconf ; /usr/bin/kibojoe			 #
 # Based pacli (credits pekman and excalibur1234 - Manjaro Linux) #
@@ -44,39 +44,39 @@ Reload menu by sending _JWM_RELOAD to the root window.
 "jwm -p"
 To check the JWM configuration and return syntax errors (including associated line numbers).
 
-4- EDIT MENU JWM
-This option is to edit the Menu settings (in ~/.jwm/menu). To edit the Menu is used medit editor.
+4- VERSION JWM
+"jwm -v"
+To check the version of JWM installed on your system.
 
-5- EDIT TRAY JWM
-This option is to edit the Tray settings (in ~/.jwm/tray). To edit the Tray is used medit editor.
+5- COMMANDS MANUAL JWM
+General manual JWM in his hands.
 
-6- EDIT START JWM
+6- HOMEPAGE JWM
+JWM Homepage where you have lots of information.
+
+7- EDIT TRAY-BAR JWM
+This option is to edit the Tray-Bar settings (in ~/.jwm/tray ~/.jwm/bar). To edit the Tray is used medit editor.
+
+8- EDIT START JWM
 This option is to edit the Start settings (in ~/.jwm/start). To edit the Start is used medit editor.
 
-7- EDIT THEME JWM
+9- EDIT THEME JWM
 This option is to edit the Theme settings (in ~/.jwm/theme). To edit the Theme is used medit editor.
 
-8- EDIT KEYS JWM
+10- EDIT KEYS JWM
 This option is to edit the Keys settings (in ~/.jwm/keys). To edit the Keys is used medit editor.
 
-9- EDIT GROUPS JWM
+11- EDIT GROUPS JWM
 This option is to edit the Groups settings (in ~/.jwm/groups). To edit the Groups is used medit editor.
 
-10- EDIT PREFERENCES JWM
+12- EDIT PREFERENCES JWM
 This option is to edit the Preferences settings (in ~/.jwm/preferences). To edit the Preferences is used medit editor.
 
-11- EDIT JWMRC
+13- EDIT MENU JWM
+This option is to edit the Menu settings (in ~/.jwm/menu). To edit the Menu is used medit editor.
+
+14- EDIT JWMRC
 This option is to edit the jwmrc settings (in ~/.jwmrc). To edit the jwmrc is used medit editor.
-
-12- COMMANDS MANUAL JWM
-General commands manual of the Joe's Window Manager (JWM). JWM is a window manager for X11 Window System.
-
-13- VERSION JWM
-"jwm -v"
-Display version information JWM.
-
-14- HOMEPAGE JWM
-Visit and know the website of JWM.
 
 15- EDIT CONKY
 Conky a lightweight system monitor.
@@ -99,8 +99,8 @@ GTK+, or the GIMP Toolkit, is a multi-platform toolkit for creating graphical us
 20- EDIT GTK3
 GTK+, or the GIMP Toolkit, is a multi-platform toolkit for creating graphical user interfaces. Offering a complete set of widgets, GTK+ is suitable for projects ranging from small one-off tools to complete application suites. Version 3.
 
-21- EDIT XRESOURCES
-Xresources is a user-level configuration dotfile, typically located at ~/.Xresources.
+21- EDIT LeaveJWM
+Consists of the following functions: logout, lock, reboot, shutdown, suspend and cancel. You can remove or add other functions and configure the appearance of LeaveJWM.
 
 22- EDIT LXDM
 LXDM is a lightweight display manager for the LXDE desktop environment. The UI is implemented with GTK+ 2.
@@ -117,10 +117,10 @@ To exit this information page, press "q".
     echo -e "                         Manage your JWM with attention!"
     echo -e " ┌─────────────────────────────────────────────────────────────────────────┐"
     echo -e " │     1     Refresh Configuration JWM         2     Refresh Menu JWM      │"
-    echo -e " │     3     Check Error JWM                   4     Homepage JWM          │"
-    echo -e " │     5     Commands Manual JWM               6     Version JWM           │"
+    echo -e " │     3     Check Error JWM                   4     Version JWM           │"
+    echo -e " │     5     Commands Manual JWM               6     Homepage JWM          │"
     echo -e " │-------------------------------------------------------------------------│"
-    echo -e " │     7    *Edit Tray JWM                     8    *Edit Start JWM        │"
+    echo -e " │     7    *Edit Tray-Bar JWM                 8    *Edit Start JWM        │"
     echo -e " │     9    *Edit Theme JWM                   10    *Edit Keys JWM         │"
     echo -e " │    11    *Edit Groups JWM                  12    *Edit Preferences JWM  │"
     echo -e " │    13    *Edit Menu JWM                    14    *Edit jwmrc            │"
@@ -131,7 +131,7 @@ To exit this information page, press "q".
     echo -e " │    17     Edit Gmrun                       18     Edit Bashrc           │"
     echo -e " │-------------------------------------------------------------------------│"
     echo -e " │    19    *Edit GTK2              	      20    *Edit GTK3             │"
-    echo -e " │    21    *Edit Xresources 	              22    *Edit LXDM             │"
+    echo -e " │    21    *Edit LeaveJWM 	              22    *Edit LXDM             │"
     echo " └─────────────────────────────────────────────────────────────────────────┘"
     echo ""
     echo -e "       ✓ Select a number and press [Enter] ✓ e Exit ✓ i Information"
@@ -158,12 +158,12 @@ To exit this information page, press "q".
             echo
             echo -e "Check error verified! Return to JWMconf press [Enter]"
             read
-            ;;
+            ;; 
 	  4)
             echo
-            $BROWSER http://joewing.net/projects/jwm/index.shtml
+            jwm -v
             echo
-            echo -e "Homepage visited! Return to JWMconf press [Enter]"
+            echo -e "Known version! Return to JWMconf press [Enter]"
             read
             ;;
 	  5)
@@ -175,16 +175,16 @@ To exit this information page, press "q".
             ;;
 	  6)
             echo
-            jwm -v
+            $BROWSER http://joewing.net/projects/jwm/index.shtml
             echo
-            echo -e "Known version! Return to JWMconf press [Enter]"
+            echo -e "Homepage visited! Return to JWMconf press [Enter]"
             read
-            ;;
+            ;;  
 	  7)
             echo
-            medit ~/.jwm/tray
+            medit ~/.jwm/tray ~/.jwm/bar 
             echo
-            echo -e "Done tray file edition! Return to JWMconf press [Enter]"
+            echo -e "Done tray-bar files edition! Return to JWMconf press [Enter]"
             read
             ;;
 	  8)
@@ -280,9 +280,9 @@ To exit this information page, press "q".
             ;;	
 	21)
             echo
-            medit $HOME/.Xresources
+            medit /usr/bin/kibojoe/leavejwm
             echo
-            echo -e "Done Xresources file edition! Return to JWMconf press [Enter]"
+            echo -e "Done LeaveJWM file edition! Return to JWMconf press [Enter]"
             read
             ;;
 	 22)

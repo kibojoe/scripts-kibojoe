@@ -2,8 +2,8 @@
 #
 ######################################################
 # Kibojoe Linux					     #
-# Updated 18.02.2017 18:23:49 			     #
-# Version 0.1-1 				     #
+# Version 1-1					     #
+# Updated Feb. 2017	 			     #
 # Name empty_folderclean ; Remove Empty Folders Home #
 # Use chmod +x empty_folderclean ; /usr/bin/kibojoe  #
 # Link sysclean ; pacli 			     #

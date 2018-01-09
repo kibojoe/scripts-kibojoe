@@ -2,8 +2,8 @@
 #
 ################################################################################################################
 # Kibojoe Linux												       #
-# Updated 25.03.2017 15:01:55										       #
-# Version 0.1-1												       #
+# Version 1-1												       #
+# Updated Mar. 2017											       #
 # Name kdusm ; Kernel Driver User Settings Manager							       #
 # Use chmod +x kdusm ; /usr/bin/kibojoe									       #
 # Based pacli (credits pekman and excalibur1234 - Manjaro Linux) and mhwd-kern (credits handy - Manjaro Linux) #

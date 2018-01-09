@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-######################################################
-# Kibojoe Linux					     #
-# Updated 29.11.2017 22:58:31			     #
-# Version 0.1-1					     #
-# Name basic_clean ; Basic Cleaning		     #
-# Use chmod +x basic_clean ; /usr/bin/kibojoe	     #
-# Credit Holmes (Kibojoe Linux)			     #
-# Site http://kibojoe.org                            #
-# License Copyleft				     #
-######################################################
+###############################################
+# Kibojoe Linux				      #
+# Version 1-1				      #
+# Updated Nov. 2017			      #
+# Name basic_clean ; Basic Cleaning	      #
+# Use chmod +x basic_clean ; /usr/bin/kibojoe #
+# Credit Holmes (Kibojoe Linux)		      #
+# Site http://kibojoe.org                     #
+# License Copyleft			      #
+###############################################
 
 sudo rm -rf /root/.local/share/Trash/files	# Empty trash root
 sudo rm -rf /root/.local/share/Trash/info	# Empty trash root

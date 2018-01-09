@@ -2,8 +2,8 @@
 #
 ###################################################
 # Kibojoe Linux					  #
-# Updated 18.02.2017 18:23:49                     #
-# Version 0.1-1					  #
+# Version 1-1					  #
+# Updated Feb. 2017	                          #
 # Name empty_fileclean ; Remove Empty Files Home  #
 # Use chmod +x empty_fileclean ; /usr/bin/kibojoe #
 # Link sysclean ; pacli				  #
