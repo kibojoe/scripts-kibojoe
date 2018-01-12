@@ -280,7 +280,7 @@ To exit this information page, press "q".
             ;;	
 	21)
             echo
-            medit /usr/bin/kibojoe/leavejwm
+            medit /usr/bin/kibojoe/leave_jwm
             echo
             echo -e "Done LeaveJWM file edition! Return to JWMconf press [Enter]"
             read

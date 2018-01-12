@@ -28,4 +28,6 @@ rm -rf ~/wget*					# Polluted wget-log files
 
 echo "Done basic cleaning...!"
 sleep 2
+read
 clear && kill -9 -$PPID
+;;
