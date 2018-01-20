@@ -132,30 +132,24 @@ To exit this Help Page, press "q".
 	EOF
 }
 
+function func_a() {
+	local pkg
+
+	# ask user a question and save answer in "pkg" variable
+        echo "Type name or description of package to be searched and press [Enter]"
+        read -r pkg
+            
+        yaourt $pkg
+}
+
 # "yaourt -Sl" downloads a list of packages EVERY TIME it is called. this is unacceptable.
 # write package list of repositories to /tmp/packages. then, download AUR package list and add it to the bottom of /tmp/packages.
 pacman -Slq > /tmp/packages &
 wget -P /tmp/aur/ https://aur.archlinux.org/packages.gz &>/dev/null && cat /tmp/aur/packages.gz >> /tmp/packages &
 
-function func_a 
-{
-		local pkg
-		
-		if [[ -n "$input2" ]]
-		then
-			# do this if variable "input" is not empty:
-			yaourt "$input2"
-		else
-			# do this if pacli is used with UI or no argument is specified in "pacli a" command:
-			echo "Type name or description of package to be searched and press [Enter]"
-			read -r pkg
-            
-			yaourt $pkg
-		fi
-}
-
-    while true; do
+while true; do
     clear
+    
     echo ""
     echo -e "                             Pacli Package Manager"
     echo ""
@@ -179,6 +173,7 @@ function func_a
     echo ""
     echo -e "       ✓ Select a number and press [Enter] ✓ e Exit ✓ i Information"
     echo ""
+    
     read choix
     case $choix in
           1)
@@ -218,7 +213,7 @@ function func_a
             ;;
           6)
             echo
-            yaourt -Sii $(cat /tmp/packages | fzf --color fg:#e5e5e5,fg+:#215d9c,prompt:#e5e5e5,info:#c0392b,pointer:#c0392b,spinner:#c0392b --reverse --prompt='Select a package to display information about ▶ ') 
+            yaourt -Sii $(sort -u /tmp/packages | fzf --color fg:#e5e5e5,fg+:#215d9c,prompt:#e5e5e5,info:#c0392b,pointer:#c0392b,spinner:#c0392b --reverse --prompt='Select a package to display information about ▶ ') 
             echo
             echo -e "Package information displayed! Return to Pacli press [Enter]"
             read     
@@ -302,7 +297,7 @@ function func_a
             ;;
          18)
             echo
-            yaourt -S $(cat /tmp/packages | fzf --color fg:#e5e5e5,fg+:#215d9c,prompt:#e5e5e5,info:#c0392b,pointer:#c0392b,spinner:#c0392b --reverse --prompt='Select a package to install (toggle selection with TAB) ▶ ')
+            yaourt -S $(sort -u /tmp/packages | fzf --color fg:#e5e5e5,fg+:#215d9c,prompt:#e5e5e5,info:#c0392b,pointer:#c0392b,spinner:#c0392b --reverse --prompt='Select a package to install (toggle selection with TAB) ▶ ')
             echo
             echo -e "Installation from AUR finished! Return to Pacli press [Enter]"
             read  
