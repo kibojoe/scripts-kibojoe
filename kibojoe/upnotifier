@@ -21,12 +21,6 @@ else
    nb_aur=0
 fi
 
-if [ -f /usr/bin/pacaur ]; then
-    nb_aur=$(pacaur -Qua | grep "^aur/" | tee /tmp/aurupdates | wc -l)
-else
-    nb_aur=0
-fi
-
 if ((nb_pac>0 || nb_aur>0)); then
   ((nb_aur>0)) && nb_aur="+ ${nb_aur}"
   ((nb_aur==0)) && unset nb_aur
