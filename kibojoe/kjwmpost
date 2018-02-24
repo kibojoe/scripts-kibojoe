@@ -193,7 +193,7 @@ install_check() {
 }
 
 print_title() {
-    printf "\033[38;5;160mKJWM Post Installation%s\033[0m\n\n" "$@"
+    printf "\033[38;5;34mKJWM Post Installation%s\033[0m\n\n" "$@"
 }
 
 print_main() {
