@@ -198,10 +198,10 @@ print_title() {
 
 print_main() {
     printf '%b\n' "Welcome to Kibojoe Linux, you're in the KJWM Post Installation.\n"\
-                  "The purpose of this post installation script is to automate common tasks which"\
+                  "The purpose of this post installation script  is to automate common tasks which"\
                   "should help you to get you started using your brand new installation.\n"\
                   "It is by no means mandatory to run this script, however it is recommended to go"\
-                  "throught this script once, as it is a very helpful addition. It is recommended"\
+                  "throught this script once,  as it is a very helpful addition. It is recommended"\
                   "to start from the first step and then work your way down. Use with care!\n"
 
 }
@@ -529,7 +529,7 @@ quit() {
 clear
 print_title
 print_main
-printf '%b\n' "It is necessary for this script that an internet conncetion is available. Please"\
+printf '%b\n' "It is  necessary for this  script that internet conncetion is available. Please"\
               "make sure that you have a working connection before you continue. Press [Enter]"\
               "to perform a connection check!\n"
 
