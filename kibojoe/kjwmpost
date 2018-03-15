@@ -61,7 +61,7 @@ slct() {
             read -e -n ${##} -p "$PS3" REPLY
 
             if [[ $REPLY != [0-9]* ]]; then
-                echo "Wrong option! Choose a number from 1 to 6 or r/q..."
+                echo "Wrong option! Choose a number from 1 to 7 or r/q..."
                 continue
             elif (( 10#$REPLY == 0 )); then
                 local quitslct=1
@@ -212,11 +212,12 @@ main() {
         print_title
         print_main
         printf '%b\n' "1 = Optimize mirrors and update system"\
-                      "2 = Install and configure firewall"\
-                      "3 = AUR support"\
-                      "4 = Multimedia support"\
-                      "5 = Printer drivers"\
-                      "6 = Install applications sorted by category"\
+		      "2 = Activate processor cores"\
+                      "3 = Install and configure firewall"\
+                      "4 = AUR support"\
+                      "5 = Multimedia support"\
+                      "6 = Printer drivers"\
+                      "7 = Install applications sorted by category"\
                       "r = Never display at boot again"\
                       "q = Quit\n"
         while true; do
@@ -224,31 +225,43 @@ main() {
             case "$REPLY" in
                 1)  clear
                     rank_sync_update
-                    clear
+		    sleep 3                    
+		    clear
                     break
                     ;;
-                2)  clear
-                    install_firewall
+		2)  clear
+                    activate_processor
+		    sleep 3
                     clear
-                    break
+		    break
                     ;;
                 3)  clear
-                    install_aur
-                    clear
+                    install_firewall
+                    sleep 3
+		    clear
                     break
                     ;;
                 4)  clear
-                    install_media
+                    install_aur
+                    sleep 3
                     clear
                     break
                     ;;
                 5)  clear
+                    install_media
+		    sleep 3                    
+                    clear
+                    break
+                    ;;
+                6)  clear
                     install_printer
+                    sleep 3                    
                     clear
                     break
                     ;;                        
-                6)  clear
+                7)  clear
                     install_apps
+                    sleep 3                    
                     clear
                     break
                     ;;
@@ -256,7 +269,7 @@ main() {
                     ;;
                 q)  quit
                     ;;
-                *)  echo "Wrong option! Choose a number from 1 to 6 or r/q..."
+                *)  echo "Wrong option! Choose a number from 1 to 7 or r/q..."
                     continue
                     ;;
             esac
@@ -267,6 +280,11 @@ main() {
 rank_sync_update(){
     print_title " ▶ Optimize Mirrors and Update"
     sudo pacman-mirrors -f 0 && sudo pacman -Syyu
+}
+
+activate_processor(){
+    print_title " ▶ Activate Processor Cores"
+    /usr/bin/kibojoe/activate_processor
 }
 
 install_firewall(){
