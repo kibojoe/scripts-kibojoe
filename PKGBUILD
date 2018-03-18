@@ -2,7 +2,7 @@
 
 pkgname=scripts-kibojoe
 pkgver=1802
-pkgrel=3
+pkgrel=5
 pkgdesc="Scripts for Kibojoe Linux"
 arch=('x86_64')
 license=('GPL3')
