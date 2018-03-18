@@ -212,7 +212,7 @@ main() {
         print_title
         print_main
         printf '%b\n' "1 = Optimize mirrors and update system"\
-		      "2 = Activate processor cores"\
+		      "2 = Activate processors cores"\
                       "3 = Install and configure firewall"\
                       "4 = AUR support"\
                       "5 = Multimedia support"\
@@ -283,7 +283,7 @@ rank_sync_update(){
 }
 
 activate_processor(){
-    print_title " ▶ Activate Processor Cores"
+    print_title " ▶ Activate Processors Cores"
     /usr/bin/kibojoe/activate_processor
 }
 
@@ -363,7 +363,7 @@ apps_chat=("bitlbee" "pidgin" "skype")
 apps_email=("claws-mail" "evolution" "mutt" "thunderbird" "trojita")
 apps_file=("dolphin" "mc" "nautilus" "ranger" "spacefm" "sunflower" "rox" "thunar")
 apps_graphic=("blender" "gimp" "imagemagick" "inkscape")
-apps_imgview=("gpicview" "mirage" "sxiv" "viewnior")
+apps_imgview=("mirage" "sxiv" "viewnior")
 apps_irc=("irssi" "weechat")
 apps_mpd=("mpc" "ncmpcpp" "sonata")
 apps_music=("amarok" "audacious" "banshee" "clementine" "cmus" "moc" "mpd" "rhythmbox")
@@ -374,14 +374,14 @@ apps_pdf=("evince" "mupdf" "zathura-pdf-mupdf" "zathura-pdf-poppler" "xpdf")
 apps_rss=("liferea" "newsbeuter")
 apps_spacefm=("udevil")
 apps_sysmon=("baobab" "gdmap")
-apps_systoo=("filezilla" "octopi" "octopi-notifier-frameworks" "octopi-cachecleaner" "octopi-repoeditor" "pamac" "virtualbox")
+apps_systoo=("filezilla" "octopi" "pamac" "virtualbox")
 apps_term=("deepin-terminal" "gnome-terminal" "guake" "lilyterm" "lxterminal" "roxterm" "terminator" "tilda" "xfce4-terminal")
 apps_text=("emacs" "geany" "gedit" "gvim" "vim")
 apps_thunar=("gvfs" "thunar-archive-plugin" "thunar-media-tags-plugin" "thunar-volman" "tumbler")
 apps_torrent=("deluge" "qbittorrent" "rtorrent" "transmission-cli" "transmission-gtk" "transmission-remote-cli" "transmission-qt")
-apps_util=("bleachbit" "galculator" "nitrogen" "parcellite" "tmux")
-apps_video=("gnome-mplayer" "lxmusic" "mpv" "smplayer" "vlc")
-apps_web=("chromium" "dwb" "firefox" "qupzilla" "qutebrowser" "luakit" "opera" "uzbl-tabbed")
+apps_util=("bleachbit" "galculator" "parcellite" "tmux")
+apps_video=("gnome-mplayer" "mpv" "smplayer" "vlc")
+apps_web=("chromium" "dwb" "firefox" "qutebrowser" "luakit" "opera" "uzbl-tabbed")
 apps_games=("desmume" "pcsx2" "pcsxr" "ppsspp" "snes9x-gtk" "steam-manjaro" "stella" "vbam-gtk" "yabause-gtk")
 
 declare -A apps_des=( 
@@ -416,7 +416,6 @@ declare -A apps_des=(
     ["gimp"]="GNU Image Manipulation Program"
     ["gnome-mplayer"]="A simple MPlayer GUI"
     ["gnome-terminal"]="The GNOME Terminal Emulator"
-    ["gpicview"]="lightweight image viewer"
     ["gvfs"]="For trash support, mounting with udisk and remote filesystems"
     ["gvim"]="Vi Improved (with features, such as a GUI)"
     ["guake"]="Drop-down terminal for the GNOME desktop"
@@ -430,7 +429,6 @@ declare -A apps_des=(
     ["lilyterm"]="A light and easy to use libvte based X terminal emulator"
     ["luakit"]="Fast, small, webkit based browser framework extensible by Lua"
     ["lxterminal"]="VTE-based terminal emulator (part of LXDE)"
-    ["lxmusic"]="Full featured media player that can easily manage large collections and uses the GStreamer media framework"
     ["mc"]="Midnight Commander is a text based filemanager/shell that emulates Norton Commander"
     ["mirage"]="A simple GTK+ Image Viewer"
     ["moc"]="An ncurses console audio player designed to be powerful and easy to use"
@@ -446,18 +444,13 @@ declare -A apps_des=(
     ["ncmpcpp"]="Almost exact clone of ncmpc with some new features"
     ["newsbeuter"]="A RSS feed reader for the text console with special Podcast support"
     ["octopi"]="Octopi is a GUI package manager built on Qt"
-    ["octopi-notifier-frameworks"]="Octopi accessory notifier"
-    ["octopi-cachecleaner"]="Octopi accessory cachecleaner"
-    ["octopi-repoeditor"]="Octopi accessory repoeditor"
     ["opera"]="Fast and secure web browser and internet suite"
-    ["nitrogen"]="Background browser and setter for X windows"
     ["parcellite"]="Lightweight GTK+ clipboard manager"
     ["pidgin"]="Multi-protocol instant messaging client"
     ["pcsx2"]="A Sony PlayStation 2 emulator"
     ["pcsxr"]="A Sony PlayStation (PSX) emulator based on the PCSX-df project"
     ["ppsspp"]="A PSP emulator written in C++"
     ["qbittorrent"]="Open source (GPLv2) BitTorrent client that strongly resembles µtorrent"
-    ["qupzilla"]="Cross-platform QtWebEngine browser"
     ["qutebrowser"]="A keyboard-driven, vim-like browser based on PyQt5 and QtWebKit"
     ["ranger"]="A simple, vim-like file manager"
     ["rhythmbox"]="An iTunes-like music playback and management application"
