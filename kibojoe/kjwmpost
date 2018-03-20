@@ -304,7 +304,7 @@ install_media(){
 
 install_printer(){
     print_title " ▶ Printer Drivers"
-    sudo pacman -S manjaro-printer && sudo systemctl enable org.cups.cupsd.service && sudo systemctl start org.cups.cupsd.service
+    sudo pacman -S manjaro-printer gtk3-print-backends && sudo systemctl enable org.cups.cupsd.service && sudo systemctl start org.cups.cupsd.service
 }
 
 install_apps() {
