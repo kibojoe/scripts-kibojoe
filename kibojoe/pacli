@@ -145,7 +145,7 @@ function func_a() {
 # "yaourt -Sl" downloads a list of packages EVERY TIME it is called. this is unacceptable.
 # write package list of repositories to /tmp/packages. then, download AUR package list and add it to the bottom of /tmp/packages.
 pacman -Slq > /tmp/packages &
-wget -P /tmp/aur/ https://aur.archlinux.org/packages.gz &>/dev/null && cat /tmp/aur/packages.gz >> /tmp/packages &
+wget -P /tmp/aur/https://aur.archlinux.org/packages.gz &>/dev/null && cat /tmp/aur/packages.gz >> /tmp/packages &
 
 while true; do
     clear
